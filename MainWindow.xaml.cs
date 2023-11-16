@@ -27,14 +27,61 @@ namespace BatchAudioConverter
     public sealed partial class MainWindow : Window
     {
 
-        private ObservableCollection<FolderItem> folders = new ObservableCollection<FolderItem>();
+        private readonly ObservableCollection<FolderItem> folders = new();
 
 
         public MainWindow()
         {
-            this.InitializeComponent();
-            this.ExtendsContentIntoTitleBar = true;
+            InitializeComponent();
+            ExtendsContentIntoTitleBar = true;
             FoldersListView.ItemsSource = folders;
+        }
+
+        private void ImportHandler(StorageFile file)
+        {
+            //get the folder the file is in
+            var folderPath = Path.GetDirectoryName(file.Path);
+
+            // check if a folder exists, if so, check if the file is already in it. if not, add it
+            if (folders.Count > 0)
+            {
+                foreach (var folder in folders)
+                {
+                    if (folderPath == folder.Path)
+                    {
+                        foreach (var f in folder.Files)
+                        {
+                            if (f.Path == file.Path)
+                            {
+                                return;
+                            }
+
+                        }
+                        folder.Files.Add(new FileItem
+                        {
+                            Name = file.Name,
+                            Path = file.Path,
+                            Type = file.FileType
+                        });
+                        return;
+                    }
+                }
+            }
+
+            // else, create a new folder and add the file to it
+            var newFolder = new FolderItem
+            {
+                Name = Path.GetFileName(folderPath),
+                Path = folderPath,
+                Files = new ObservableCollection<FileItem>()
+            };
+            newFolder.Files.Add(new FileItem
+            {
+                Name = file.Name,
+                Path = file.Path,
+                Type = file.FileType
+            });
+            folders.Add(newFolder);
         }
 
         private async void AddFilesButton_Click(object sender, RoutedEventArgs e)
@@ -88,53 +135,6 @@ namespace BatchAudioConverter
                     }
                 }
             }
-        }
-
-        private void ImportHandler(StorageFile file)
-        {
-            //get the folder the file is in
-            var folderPath = Path.GetDirectoryName(file.Path);
-
-            // check if a folder exists, if so, check if the file is already in it. if not, add it
-            if (folders.Count > 0)
-            {
-                foreach (var folder in folders)
-                {
-                    if (folderPath == folder.Path)
-                    {
-                        foreach (var f in folder.Files)
-                        {
-                            if (f.Path == file.Path)
-                            {
-                                return;
-                            }
-
-                        }
-                        folder.Files.Add(new FileItem
-                        {
-                            Name = file.Name,
-                            Path = file.Path,
-                            Type = file.FileType
-                        });
-                        return;
-                    }
-                }
-            }
-
-            // else, create a new folder and add the file to it
-            var newFolder = new FolderItem
-            {
-                Name = Path.GetFileName(folderPath),
-                Path = folderPath,
-                Files = new ObservableCollection<FileItem>()
-            };
-            newFolder.Files.Add(new FileItem
-            {
-                Name = file.Name,
-                Path = file.Path,
-                Type = file.FileType
-            });
-            folders.Add(newFolder);
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)

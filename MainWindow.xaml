@@ -19,7 +19,7 @@
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="14,32,14,14" CornerRadius="6" Padding="14">
             <StackPanel.Background>
-                <SolidColorBrush Color="white"/>
+                <SolidColorBrush Color="{ThemeResource ControlSolidFillColorDefault}"/>
             </StackPanel.Background>
             <Button Content="Add Files" Click="AddFilesButton_Click" Margin="5" VerticalAlignment="Stretch"/>
             <Button Content="Add Folder" Click="AddFolderButton_Click" Margin="5" VerticalAlignment="Stretch"/>
