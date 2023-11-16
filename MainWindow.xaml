@@ -12,10 +12,14 @@
         <MicaBackdrop Kind="BaseAlt"/>
     </Window.SystemBackdrop>
 
-    <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="14,32,14,14" CornerRadius="6" Padding="14">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="14,32,14,14" CornerRadius="6" Padding="14">
             <StackPanel.Background>
-                <SolidColorBrush Color="White"/>
+                <SolidColorBrush Color="white"/>
             </StackPanel.Background>
             <Button Content="Add Files" Click="AddFilesButton_Click" Margin="5" VerticalAlignment="Stretch"/>
             <Button Content="Add Folder" Click="AddFolderButton_Click" Margin="5" VerticalAlignment="Stretch"/>
@@ -38,35 +42,34 @@
             <Button Content="Save location" Margin="5" VerticalAlignment="Stretch"/>
             <Button Content="Export" Margin="5" VerticalAlignment="Stretch"/>
         </StackPanel>
-        <Grid>
-            <ListView ItemsSource="{Binding}" x:Name="FoldersListView" Margin="14,32,14,14">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" />
-                                    <TextBlock Text="{Binding Path}" />
-                                </StackPanel>
-                                <Button Content="Delete" Click="DeleteButton_Click" />
+        <ListView Grid.Row="1" ItemsSource="{Binding}" x:Name="FoldersListView" Margin="14,32,14,14">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Top" CornerRadius="6" Padding="14">
+                            <StackPanel.Background>
+                                <SolidColorBrush Color="white"/>
+                            </StackPanel.Background>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                                <TextBlock Text="{Binding Path}" />
                             </StackPanel>
-
-
-                            <ListView ItemsSource="{Binding Files}">
-                                <ListView.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                                            <TextBlock Text="{Binding Name}" />
-                                            <TextBlock Text="{Binding Path}" />
-                                            <Button Content="Delete" Click="DeleteButton_Click" />
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
+                            <Button Content="Delete" Click="DeleteButton_Click" />
                         </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </Grid>
-    </StackPanel>
+                        <ItemsControl ItemsSource="{Binding Files}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top" Padding="14">
+                                        <TextBlock Text="{Binding Name}" />
+                                        <TextBlock Text="{Binding Path}" />
+                                        <Button Content="Delete" Click="DeleteButton_Click" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
 </Window>
