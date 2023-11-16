@@ -1,7 +1,7 @@
 # BatchAudioConverter
 
 TODO:
-When files are added to an existing folder, it is not updated in ui
+Stop folder listview items being selectable, dont use listview?
 Number of items in folder
 Title bar
 Drag and drop

@@ -7,22 +7,23 @@ using System.IO;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 
-public class FileItem
-{
-    public string Name { get; set; }
-    public string Path { get; set; }
-    public string Type { get; set; }
-}
-
-public class FolderItem
-{
-    public string Name { get; set; }
-    public string Path { get; set; }
-    public List<FileItem> Files { get; set; }
-}
-
 namespace BatchAudioConverter
 {
+
+    public class FileItem
+    {
+        public string Name { get; set; }
+        public string Path { get; set; }
+        public string Type { get; set; }
+    }
+
+    public class FolderItem
+    {
+        public string Name { get; set; }
+        public string Path { get; set; }
+        public ObservableCollection<FileItem> Files { get; set; }
+    }
+
     public sealed partial class MainWindow : Window
     {
 
@@ -125,7 +126,7 @@ namespace BatchAudioConverter
             {
                 Name = Path.GetFileName(folderPath),
                 Path = folderPath,
-                Files = new List<FileItem>()
+                Files = new ObservableCollection<FileItem>()
             };
             newFolder.Files.Add(new FileItem
             {
@@ -156,7 +157,7 @@ namespace BatchAudioConverter
                             folders.Remove(folderItem);
                         }
                         return;
-                    }   
+                    }
                 }
             }
         }
