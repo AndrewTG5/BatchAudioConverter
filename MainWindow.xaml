@@ -33,41 +33,50 @@
                         <ColumnDefinition />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <RadioButton Grid.Row="0" Grid.Column="0" Content="MP3"/>
-                    <RadioButton Grid.Row="0" Grid.Column="1" Content="WAV"/>
-                    <RadioButton Grid.Row="1" Grid.Column="0" Content="FLAC"/>
-                    <RadioButton Grid.Row="1" Grid.Column="1" Content="AAC"/>
+                    <RadioButton Grid.Row="0" Grid.Column="0" Content="MP3" MinWidth="0" Margin="14 0 14 0"/>
+                    <RadioButton Grid.Row="0" Grid.Column="1" Content="WAV" MinWidth="0" Margin="14 0 14 0"/>
+                    <RadioButton Grid.Row="1" Grid.Column="0" Content="FLAC" MinWidth="0" Margin="14 0 14 0"/>
+                    <RadioButton Grid.Row="1" Grid.Column="1" Content="AAC" MinWidth="0" Margin="14 0 14 0"/>
                 </Grid>
             </Border>
             <Button Content="Save location" Margin="5" VerticalAlignment="Stretch"/>
             <Button Content="Export" Margin="5" VerticalAlignment="Stretch"/>
         </StackPanel>
-        <ListView Grid.Row="1" ItemsSource="{Binding}" x:Name="FoldersListView" Margin="14,32,14,14">
+        <ListView Grid.Row="1" ItemsSource="{Binding}" x:Name="FoldersListView" Margin="14">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Top" CornerRadius="6" Padding="14">
-                            <StackPanel.Background>
-                                <SolidColorBrush Color="white"/>
-                            </StackPanel.Background>
-                            <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                                <TextBlock Text="{Binding Name}" FontWeight="Bold" />
-                                <TextBlock Text="{Binding Path}" />
+                    <Expander Width="auto" HorizontalAlignment="Stretch" VerticalAlignment="Top" IsExpanded="True">
+                        <Expander.Header>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Top" CornerRadius="6" Margin="14">
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                                    <TextBlock Text="{Binding Path}" />
+                                </StackPanel>
+                                <Button FontFamily="Segoe Fluent Icons" Content="&#xe711;" Foreground="Red" Click="DeleteButton_Click" VerticalAlignment="Stretch" Margin="14 0 0 0"/>
                             </StackPanel>
-                            <Button Content="Delete" Click="DeleteButton_Click" />
-                        </StackPanel>
-                        <ItemsControl ItemsSource="{Binding Files}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top" Padding="14">
-                                        <TextBlock Text="{Binding Name}" />
-                                        <TextBlock Text="{Binding Path}" />
-                                        <Button Content="Delete" Click="DeleteButton_Click" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
+                        </Expander.Header>
+                        <Expander.Content>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                                <ListView ItemsSource="{Binding Files}">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top" Padding="14">
+                                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                                                    <TextBlock Text="{Binding Path}" />
+                                                </StackPanel>
+                                                <Button Grid.Column="1" FontFamily="Segoe Fluent Icons" Content="&#xe711;" Foreground="Red" Click="DeleteButton_Click" VerticalAlignment="Stretch" Margin="0 14 0 14"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                            </StackPanel>
+                        </Expander.Content>
+                    </Expander>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
