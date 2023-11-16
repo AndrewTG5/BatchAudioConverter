@@ -34,6 +34,7 @@ namespace BatchAudioConverter
         {
             InitializeComponent();
             ExtendsContentIntoTitleBar = true;
+            SetTitleBar(AppTitleBar);
             FoldersListView.ItemsSource = folders;
         }
 
