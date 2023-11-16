@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "BatchAudioConverter (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "BatchAudioConverter (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
