@@ -42,10 +42,10 @@
             <Button Content="Save location" Margin="5" VerticalAlignment="Stretch"/>
             <Button Content="Export" Margin="5" VerticalAlignment="Stretch"/>
         </StackPanel>
-        <ListView Grid.Row="1" ItemsSource="{Binding}" x:Name="FoldersListView" Margin="14">
+        <ListView Grid.Row="1" ItemsSource="{Binding}" x:Name="FoldersListView" SelectionMode="none">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Expander Width="auto" HorizontalAlignment="Stretch" VerticalAlignment="Top" IsExpanded="True">
+                    <Expander Width="auto" HorizontalAlignment="Stretch" VerticalAlignment="Top" IsExpanded="True" Margin="14">
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Top" CornerRadius="6" Margin="14">
                                 <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top">
