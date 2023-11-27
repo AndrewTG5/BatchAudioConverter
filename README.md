@@ -1,7 +1,7 @@
 # BatchAudioConverter
 
-![Light theme screenshot](Screenshot Light.png)
-![Dark theme screenshot](Screenshot Dark.png)	
+![Light theme screenshot](ScreenshotLight.png)
+![Dark theme screenshot](ScreenshotDark.png)	
 
 TODO:
 * Number of items in folder
