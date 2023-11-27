@@ -1,6 +1,7 @@
 using CSCore.Codecs;
 using CSCore.Codecs.WAV;
 using CSCore.DSP;
+using CSCore.MediaFoundation;
 using CSCore.SoundOut;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -303,6 +304,34 @@ namespace BatchAudioConverter
                         }
                     }
                     return;
+                case "aac":
+                    using (var encoder = MediaFoundationEncoder.CreateAACEncoder(source.WaveFormat, Path.Combine(outputfolder, Path.GetFileNameWithoutExtension(file) + ".aac"), 192000))
+                    {
+                        byte[] buffer = new byte[source.WaveFormat.BytesPerSecond];
+                        int read;
+
+                        while ((read = source.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            encoder.Write(buffer, 0, read);
+                        }
+                    }
+                    return;
+                case "mp3":
+                    using (var encoder = MediaFoundationEncoder.CreateMP3Encoder(source.WaveFormat, Path.Combine(outputfolder, Path.GetFileNameWithoutExtension(file) + ".mp3"), 320000))
+                    {
+                        byte[] buffer = new byte[source.WaveFormat.BytesPerSecond];
+                        int read;
+
+                        while ((read = source.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            encoder.Write(buffer, 0, read);
+                        }
+                    }
+                    return;
+                case "flac":
+                    
+                    return;
+
             }
         }
     }
