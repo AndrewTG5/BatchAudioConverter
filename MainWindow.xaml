@@ -39,14 +39,14 @@
                         <ColumnDefinition />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <RadioButton Grid.Row="0" Grid.Column="0" Content="MP3" MinWidth="0" Margin="14 0 14 0"/>
-                    <RadioButton Grid.Row="0" Grid.Column="1" Content="WAV" MinWidth="0" Margin="14 0 14 0"/>
-                    <RadioButton Grid.Row="1" Grid.Column="0" Content="FLAC" MinWidth="0" Margin="14 0 14 0"/>
-                    <RadioButton Grid.Row="1" Grid.Column="1" Content="AAC" MinWidth="0" Margin="14 0 14 0"/>
+                    <RadioButton Grid.Row="0" Grid.Column="0" Content="MP3" MinWidth="0" Margin="14 0 14 0" Checked="RadioButton_Checked" />
+                    <RadioButton Grid.Row="0" Grid.Column="1" Content="WAV" MinWidth="0" Margin="14 0 14 0" Checked="RadioButton_Checked" />
+                    <RadioButton Grid.Row="1" Grid.Column="0" Content="FLAC" MinWidth="0" Margin="14 0 14 0" Checked="RadioButton_Checked" />
+                    <RadioButton Grid.Row="1" Grid.Column="1" Content="AAC" MinWidth="0" Margin="14 0 14 0" Checked="RadioButton_Checked" />
                 </Grid>
             </Border>
-            <Button Content="Save location" Margin="5" VerticalAlignment="Stretch"/>
-            <Button Content="Export" Margin="5" VerticalAlignment="Stretch"/>
+            <Button Content="Save location" Margin="5" VerticalAlignment="Stretch" Click="SaveButton_Click"/>
+            <Button Content="Export" Margin="5" VerticalAlignment="Stretch" Click="ExportButton_Click"/>
         </StackPanel>
         <ListView Grid.Row="2" ItemsSource="{Binding}" x:Name="FoldersListView" SelectionMode="none">
             <ListView.ItemTemplate>
