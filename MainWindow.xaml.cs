@@ -37,6 +37,8 @@ namespace BatchAudioConverter
         private readonly ObservableCollection<FolderItem> folders = new();
         private string outputFolder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         private string outputFormat = null;
+        private int bitrate = 192000;
+        private int samplerate = 0; // 0 to match source sample rate
 
 
         public MainWindow()
@@ -197,6 +199,78 @@ namespace BatchAudioConverter
             }
         }
 
+        private async void ConfigButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (outputFormat == null)
+            {
+                ContentDialog noFormatDialog = new()
+                {
+                    Title = "Unable to configure",
+                    Content = "You did not select an output format",
+                    CloseButtonText = "Ok",
+                    DefaultButton = ContentDialogButton.Close,
+                    XamlRoot = Content.XamlRoot
+                };
+                await noFormatDialog.ShowAsync();
+                return;
+            }
+            else if (outputFormat == "wav")
+            {
+                ContentDialog configDialog = new()
+                {
+                    Title = "Configure format",
+                    Content = new StackPanel
+                    {
+                        Children =
+                        {
+                            new TextBlock { Text = "Sample rate (Hz). Set to 0 to match source sample rate" },
+                            new TextBox { Text = samplerate.ToString(), Name = "SampleRateTextBox" }                            
+                        }
+                    },
+                    CloseButtonText = "Cancel",
+                    PrimaryButtonText = "Ok",
+                    DefaultButton = ContentDialogButton.Primary,
+                    XamlRoot = Content.XamlRoot
+
+                };
+                configDialog.PrimaryButtonClick += (s, args) =>
+                {
+                    samplerate = int.Parse(((TextBox)configDialog.FindName("SampleRateTextBox")).Text);
+                };
+                await configDialog.ShowAsync();
+                return;
+            }
+            else
+            {
+                ContentDialog configDialog = new()
+                {
+                    Title = "Configure format",
+                    Content = new StackPanel
+                    {
+                        Children =
+                        {                         
+                            new TextBlock { Text = "Sample rate (Hz). Set to 0 to match source sample rate" },
+                            new TextBox { Text = samplerate.ToString(), Name = "SampleRateTextBox" },
+                            new TextBlock { Text = "Bitrate (kbps)" },
+                            new Slider { Value = bitrate/1000, Minimum = 96, Maximum = 320, StepFrequency = 2, Name = "BitrateSlider" },
+                        }
+                    },
+                    CloseButtonText = "Cancel",
+                    PrimaryButtonText = "Ok",
+                    DefaultButton = ContentDialogButton.Primary,
+                    XamlRoot = Content.XamlRoot
+
+                };
+                configDialog.PrimaryButtonClick += (s, args) =>
+                {
+                    bitrate = (int)((Slider)configDialog.FindName("BitrateSlider")).Value * 1000;
+                    samplerate = int.Parse(((TextBox)configDialog.FindName("SampleRateTextBox")).Text);
+                };
+                await configDialog.ShowAsync();
+                return;
+            }
+        }
+
         private async void ExportButton_Click(object sender, RoutedEventArgs e)
         {
             if (outputFormat == null)
@@ -271,7 +345,7 @@ namespace BatchAudioConverter
                     Parallel.ForEach(filesToConvert, (file) =>
                     {
                         // Convert the file
-                        ConvertFile(file, outputFolder, outputFormat);
+                        ConvertFile(file, outputFolder, outputFormat, bitrate, samplerate);
 
                         // Report progress
                         int newCount = Interlocked.Increment(ref convertedFilesCount);
@@ -283,7 +357,7 @@ namespace BatchAudioConverter
             await exportDialog.ShowAsync();
         }
 
-        private static void ConvertFile(string file, string outputfolder, string outputformat)
+        private static void ConvertFile(string file, string outputfolder, string outputformat, int bitrate, int samplerate)
         {
             using CSCore.IWaveSource source = CodecFactory.Instance.GetCodec(file);
             switch (outputformat)
@@ -291,48 +365,85 @@ namespace BatchAudioConverter
                 case "wav":
                     using (DirectSoundOut soundOut = new())
                     {
-                        using DmoResampler resampler = new(source, source.WaveFormat.SampleRate); // match source sample rate
-                        soundOut.Initialize(resampler);
-                        string output = Path.Combine(outputfolder, Path.GetFileNameWithoutExtension(file) + ".wav");
-                        using WaveWriter waveWriter = new(output, resampler.WaveFormat);
-                        byte[] buffer = new byte[resampler.WaveFormat.BytesPerSecond];
-                        int read;
+                        byte[] buffer;
 
-                        while ((read = resampler.Read(buffer, 0, buffer.Length)) > 0)
+                        if (samplerate == 0) // skip resampling if keeping source sample rate
                         {
-                            waveWriter.Write(buffer, 0, read);
+                            buffer = new byte[source.WaveFormat.BytesPerSecond];
+                            using WaveWriter waveWriter = new(Path.Combine(outputfolder, Path.GetFileNameWithoutExtension(file) + ".wav"), source.WaveFormat);
+                            int read;
+                            while ((read = source.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                waveWriter.Write(buffer, 0, read);
+                            }
+                        }
+                        else
+                        {
+                            using DmoResampler resampler = new(source, samplerate); // resample to specified sample rate
+                            soundOut.Initialize(resampler);
+                            buffer = new byte[resampler.WaveFormat.BytesPerSecond];
+                            using WaveWriter waveWriter = new(Path.Combine(outputfolder, Path.GetFileNameWithoutExtension(file) + ".wav"), resampler.WaveFormat);
+                            int read;
+                            while ((read = resampler.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                waveWriter.Write(buffer, 0, read);
+                            }
                         }
                     }
                     return;
                 case "aac":
-                    using (var encoder = MediaFoundationEncoder.CreateAACEncoder(source.WaveFormat, Path.Combine(outputfolder, Path.GetFileNameWithoutExtension(file) + ".aac"), 192000))
+                    using (var encoder = MediaFoundationEncoder.CreateAACEncoder(source.WaveFormat, Path.Combine(outputfolder, Path.GetFileNameWithoutExtension(file) + ".aac"), bitrate))
                     {
-                        byte[] buffer = new byte[source.WaveFormat.BytesPerSecond];
-                        int read;
-
-                        while ((read = source.Read(buffer, 0, buffer.Length)) > 0)
+                        if (samplerate == 0) // skip resampling if keeping source sample rate
                         {
-                            encoder.Write(buffer, 0, read);
+                            byte[] buffer = new byte[source.WaveFormat.BytesPerSecond];
+                            int read;
+                            while ((read = source.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                encoder.Write(buffer, 0, read);
+                            }
+                        }
+                        else
+                        {
+                            using DmoResampler resampler = new(source, samplerate); // resample to specified sample rate
+                            byte[] buffer = new byte[resampler.WaveFormat.BytesPerSecond];
+                            int read;
+                            while ((read = resampler.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                encoder.Write(buffer, 0, read);
+                            }
                         }
                     }
                     return;
                 case "mp3":
-                    using (var encoder = MediaFoundationEncoder.CreateMP3Encoder(source.WaveFormat, Path.Combine(outputfolder, Path.GetFileNameWithoutExtension(file) + ".mp3"), 320000))
+                    using (var encoder = MediaFoundationEncoder.CreateMP3Encoder(source.WaveFormat, Path.Combine(outputfolder, Path.GetFileNameWithoutExtension(file) + ".mp3"), bitrate))
                     {
-                        byte[] buffer = new byte[source.WaveFormat.BytesPerSecond];
-                        int read;
-
-                        while ((read = source.Read(buffer, 0, buffer.Length)) > 0)
+                        if (samplerate == 0) // skip resampling if keeping source sample rate
                         {
-                            encoder.Write(buffer, 0, read);
+                            byte[] buffer = new byte[source.WaveFormat.BytesPerSecond];
+                            int read;
+                            while ((read = source.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                encoder.Write(buffer, 0, read);
+                            }
+                        }
+                        else
+                        {
+                            using DmoResampler resampler = new(source, samplerate); // resample to specified sample rate
+                            byte[] buffer = new byte[resampler.WaveFormat.BytesPerSecond];
+                            int read;
+                            while ((read = resampler.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                encoder.Write(buffer, 0, read);
+                            }
                         }
                     }
                     return;
-                case "flac":
-                    
+                default:
                     return;
 
             }
         }
+
     }
 }

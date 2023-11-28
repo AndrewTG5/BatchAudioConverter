@@ -10,4 +10,6 @@ TODO:
 * Taskbar title
 * Get list of supported import file types
 * Fix export window too short for content
-* Sample rate and bitrate options
+* Show current export path
+* FLAC support
+* Changing sample rate changes speed instead of output sample rate
